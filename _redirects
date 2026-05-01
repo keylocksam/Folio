@@ -1,0 +1,2 @@
+# All traffic goes through the password gate first
+# This is handled by the gate.html page via Netlify

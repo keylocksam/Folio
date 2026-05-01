@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folio — Private Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#faf5ee;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.card{background:#fbf7f0;border:1px solid rgba(43,35,29,.10);border-radius:28px;padding:52px 48px;width:100%;max-width:420px;box-shadow:0 22px 60px rgba(43,35,29,.10),0 6px 18px rgba(43,35,29,.05);text-align:center}
+.logo{font-family:'Fraunces',serif;font-weight:600;font-size:22px;color:#2b231d;letter-spacing:-.02em;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:32px}
+.dot{width:9px;height:9px;background:#2f8a5f;border-radius:50%}
+.lock{font-size:40px;margin-bottom:20px}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:26px;color:#2b231d;letter-spacing:-.015em;margin-bottom:8px}
+p{font-size:14px;color:rgba(43,35,29,.5);line-height:1.6;margin-bottom:32px}
+.pin-wrap{display:flex;justify-content:center;gap:10px;margin-bottom:24px}
+.pin-digit{width:54px;height:60px;border:2px solid rgba(43,35,29,.15);border-radius:12px;font-family:'Fraunces',serif;font-size:26px;font-weight:600;text-align:center;color:#2b231d;background:#faf5ee;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-text-security:disc}
+.pin-digit:focus{border-color:#2f8a5f;box-shadow:0 0 0 3px rgba(47,138,95,.12)}
+.pin-digit.err{border-color:#d96c5b;animation:shake .3s ease}
+.btn{width:100%;padding:15px;background:#2f8a5f;color:#fff;border:none;border-radius:999px;font-family:'Inter',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(47,138,95,.22)}
+.btn:hover{background:#236a49;transform:translateY(-1px)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.err-msg{font-size:13px;color:#d96c5b;margin-top:12px;min-height:20px;font-weight:500}
+.hint{font-size:12px;color:rgba(43,35,29,.35);margin-top:20px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><span class="dot"></span>Folio</div>
+  <div class="lock">🔒</div>
+  <h1>Private preview</h1>
+  <p>This site is currently in private preview. Enter the access PIN to continue.</p>
+  <div class="pin-wrap">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="p1" oninput="next(this,'p2')" onkeydown="back(event,this,null)">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="p2" oninput="next(this,'p3')" onkeydown="back(event,this,'p1')">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="p3" oninput="next(this,'p4')" onkeydown="back(event,this,'p2')">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="p4" oninput="next(this,null)" onkeydown="back(event,this,'p3')">
+  </div>
+  <button class="btn" onclick="checkPin()" id="submitBtn">Enter site →</button>
+  <div class="err-msg" id="errMsg"></div>
+  <div class="hint">Contact Folio to request access</div>
+</div>
+
+<script>
+// ── PIN — change this to whatever 4-digit code you want ────────
+const CORRECT_PIN = '2847';
+// ──────────────────────────────────────────────────────────────
+
+function next(el, nextId) {
+  if (el.value.length === 1 && nextId) {
+    document.getElementById(nextId).focus();
+  }
+  // Auto-submit when last digit entered
+  if (!nextId && el.value.length === 1) {
+    checkPin();
+  }
+}
+
+function back(e, el, prevId) {
+  if (e.key === 'Backspace' && el.value === '' && prevId) {
+    document.getElementById(prevId).focus();
+  }
+}
+
+function checkPin() {
+  const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
+  if (pin.length < 4) {
+    document.getElementById('errMsg').textContent = 'Please enter all 4 digits';
+    return;
+  }
+  if (pin === CORRECT_PIN) {
+    // Store access in sessionStorage so they don't need to re-enter on refresh
+    sessionStorage.setItem('folio_gate', 'open');
+    const dest = sessionStorage.getItem('folio_dest') || 'index.html';
+    sessionStorage.removeItem('folio_dest');
+    window.location.href = dest;
+  } else {
+    document.getElementById('errMsg').textContent = 'Incorrect PIN — try again';
+    ['p1','p2','p3','p4'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+      el.classList.add('err');
+      setTimeout(() => el.classList.remove('err'), 400);
+    });
+    document.getElementById('p1').focus();
+  }
+}
+
+// Already has access? Skip gate
+if (sessionStorage.getItem('folio_gate') === 'open') {
+  window.location.href = sessionStorage.getItem('folio_dest') || 'index.html';
+}
+
+// Focus first digit on load
+document.getElementById('p1').focus();
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folio — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0a0f;--ink-80:rgba(10,10,15,0.8);--ink-40:rgba(10,10,15,0.4);
+  --surface:#f7f7f9;--white:#fff;--green:#16a06a;--green-light:#e8f7f1;--green-dark:#0e7a50;
+  --indigo:#4f46e5;--indigo-light:#eef2ff;--amber:#f59e0b;--amber-light:#fffbeb;
+  --red:#ef4444;--red-light:#fef2f2;
+  --border:rgba(10,10,15,0.10);--border-strong:rgba(10,10,15,0.18);
+  --shadow-md:0 4px 16px rgba(10,10,15,0.10);
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;
+  --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--surface);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{background:var(--ink);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07)}
+.nav-logo{font-family:var(--font-d);font-weight:800;font-size:18px;color:#fff;text-decoration:none;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
+.nav-dot{width:7px;height:7px;background:var(--green);border-radius:50%}
+.nav-badge{background:rgba(239,68,68,0.2);color:#fca5a5;font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px;letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-link{font-size:13px;color:rgba(255,255,255,0.45);text-decoration:none;transition:color .15s}
+.nav-link:hover{color:#fff}
+
+/* LOCK SCREEN */
+.lock-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.lock-card{background:#fff;border-radius:var(--r-xl);padding:44px;width:100%;max-width:380px;box-shadow:var(--shadow-md);border:1px solid var(--border);text-align:center}
+.lock-icon{font-size:36px;margin-bottom:16px}
+.lock-title{font-family:var(--font-d);font-weight:700;font-size:20px;margin-bottom:6px}
+.lock-sub{font-size:14px;color:var(--ink-40);margin-bottom:28px;line-height:1.5}
+.lock-input{width:100%;padding:12px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-b);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;text-align:center;letter-spacing:0.1em;margin-bottom:12px}
+.lock-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,160,106,0.1)}
+.lock-input.err{border-color:var(--red)}
+.lock-btn{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--r-md);font-family:var(--font-b);font-weight:700;font-size:14px;cursor:pointer;transition:background .15s}
+.lock-btn:hover{background:var(--green-dark)}
+.lock-err{font-size:12px;color:var(--red);margin-top:8px}
+
+/* MAIN */
+.admin-wrap{max-width:1100px;margin:0 auto;padding:32px 28px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px}
+.page-title{font-family:var(--font-d);font-weight:700;font-size:22px}
+.page-sub{font-size:13.5px;color:var(--ink-40);margin-top:3px}
+
+/* SETTINGS BANNER */
+.settings-banner{background:#fff;border-radius:var(--r-lg);border:1px solid var(--border);padding:20px 24px;margin-bottom:22px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.settings-banner-icon{font-size:22px;flex-shrink:0}
+.settings-banner-text{flex:1}
+.settings-banner-text strong{font-size:14px;font-weight:700;display:block;margin-bottom:2px}
+.settings-banner-text span{font-size:13px;color:var(--ink-40)}
+.settings-email-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.settings-input{padding:9px 13px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-b);font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s;min-width:260px}
+.settings-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,160,106,0.1)}
+.save-email-btn{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-family:var(--font-b);font-weight:600;font-size:13px;cursor:pointer;transition:background .15s;white-space:nowrap}
+.save-email-btn:hover{background:var(--green-dark)}
+.saved-tag{font-size:12px;color:var(--green);font-weight:600;display:none}
+.saved-tag.show{display:inline}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-card{background:#fff;border-radius:var(--r-lg);border:1px solid var(--border);padding:18px 20px}
+.kpi-label{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-40);margin-bottom:6px}
+.kpi-value{font-family:var(--font-d);font-weight:800;font-size:28px;letter-spacing:-0.02em;line-height:1}
+.kpi-sub{font-size:12px;color:var(--ink-40);margin-top:4px}
+
+/* TABLE */
+.table-panel{background:#fff;border-radius:var(--r-lg);border:1px solid var(--border);overflow:hidden;margin-bottom:22px}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-weight:700;font-size:14px}
+.table-search{padding:7px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-b);font-size:13px;outline:none;width:220px;transition:border-color .15s}
+.table-search:focus{border-color:var(--green)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);border-bottom:1px solid var(--border);text-align:left;background:var(--surface)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(22,160,106,0.03)}
+.firm-cell{display:flex;align-items:center;gap:10px}
+.firm-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:12px;color:#fff;flex-shrink:0}
+.firm-name{font-weight:600;font-size:13.5px}
+.firm-slug{font-size:11px;color:var(--ink-40);font-family:monospace}
+.plan-badge{display:inline-flex;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.03em}
+.plan-free{background:var(--surface);color:var(--ink-40)}
+.plan-starter{background:var(--blue-light,#eff6ff);color:#3b82f6}
+.plan-growth{background:var(--indigo-light);color:var(--indigo)}
+.plan-pro{background:var(--amber-light);color:#b45309}
+.prospect-count{font-family:var(--font-d);font-weight:700;font-size:14px}
+.action-row{display:flex;gap:6px}
+.action-link{padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11.5px;font-weight:600;color:var(--ink-40);text-decoration:none;cursor:pointer;transition:all .15s;background:#fff}
+.action-link:hover{border-color:var(--indigo);color:var(--indigo)}
+.action-link.danger{color:var(--red)}.action-link.danger:hover{border-color:var(--red);background:var(--red-light)}
+.time-ago{font-size:12px;color:var(--ink-40)}
+.empty-row td{text-align:center;padding:48px;color:var(--ink-40);font-size:14px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:var(--r-md);font-size:13.5px;font-weight:500;box-shadow:0 8px 30px rgba(10,10,15,0.2);transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(0.34,1.56,0.64,1);z-index:200;display:flex;align-items:center;gap:9px}
+.toast.show{transform:translateY(0);opacity:1}
+.ti{color:var(--green)}
+
+/* EXPORT */
+.export-btn{padding:8px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-b);font-weight:600;font-size:12.5px;color:var(--ink-40);background:#fff;cursor:pointer;transition:all .15s}
+.export-btn:hover{border-color:var(--ink);color:var(--ink)}
+</style>
+</head>
+<body>
+<script>
+// Gate check — redirects to PIN page if not authenticated
+(function(){
+  if(sessionStorage.getItem('folio_gate')!=='open'){
+    sessionStorage.setItem('folio_dest',window.location.href.split('/').pop()||'index.html');
+    window.location.replace('gate.html');
+  }
+})();
+</script>
+
+<nav>
+  <div class="nav-logo"><span class="nav-dot"></span>Folio <span class="nav-badge">ADMIN</span></div>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">← Back to site</a>
+  </div>
+</nav>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen" class="lock-wrap">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <h2 class="lock-title">Admin access</h2>
+    <p class="lock-sub">This page is for Folio administrators only. Enter your admin password to continue.</p>
+    <input class="lock-input" type="password" id="adminPassInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPass()">
+    <button class="lock-btn" onclick="checkPass()">Enter admin panel →</button>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none">
+  <div class="admin-wrap">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Advisor signups</div>
+        <div class="page-sub">Every firm that has created a Folio account</div>
+      </div>
+      <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+
+    <!-- NOTIFICATION EMAIL SETTINGS -->
+    <div class="settings-banner">
+      <div class="settings-banner-icon">📧</div>
+      <div class="settings-banner-text">
+        <strong>Signup notification email</strong>
+        <span>You'll receive an email alert at this address whenever a new advisor signs up</span>
+      </div>
+      <div class="settings-email-row">
+        <input class="settings-input" type="email" id="notifEmail" placeholder="you@yourEmail.com">
+        <button class="save-email-btn" onclick="saveEmail()">Save</button>
+        <span class="saved-tag" id="savedTag">✓ Saved</span>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- ADVISORS TABLE -->
+    <div class="table-panel">
+      <div class="table-header">
+        <span class="table-title">All advisor accounts</span>
+        <input class="table-search" type="text" placeholder="Search firm or email..." oninput="filterTable(this.value)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Firm</th>
+            <th>Advisor</th>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Prospects</th>
+            <th>Signed up</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="advisorTableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ti">✓</span><span id="toastMsg">Done</span></div>
+
+<script>
+
+  // ── Folio API (calls Netlify Function — no CORS ever) ─────────
+  const API = '/.netlify/functions/api';
+
+  async function apiCall(action, data={}) {
+    const isGet = ['get-firm','get-prospects','get-all-firms'].includes(action);
+    let url = API + '?action=' + action;
+    const opts = { headers: { 'Content-Type': 'application/json' } };
+    if (isGet) {
+      Object.entries(data).forEach(([k,v]) => url += '&' + k + '=' + encodeURIComponent(v));
+      opts.method = 'GET';
+    } else {
+      opts.method = 'POST';
+      opts.body = JSON.stringify(data);
+    }
+    const r = await fetch(url, opts);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'API error ' + r.status);
+    return d;
+  }
+  // ─────────────────────────────────────────────────────────────
+
+  const SB_URL='https://imbzlxqaxkoahaditkdr.supabase.co', SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltYnpseHFheGtvYWhhZGl0a2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMDk3NzIsImV4cCI6MjA5Mjg4NTc3Mn0.cYUh4fvED-t_tq93ybZZhAa7PhguyMVkyJs96CWB5sQ';
+  const sbH = {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+  async function sbGet(table, filters={}) {
+    let url = SB_URL+'/rest/v1/'+table+'?select=*';
+    Object.entries(filters).forEach(([k,v])=>url+='&'+k+'=eq.'+encodeURIComponent(v));
+    url += '&order=submitted_at.desc';
+    const r = await fetch(url, {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    return r.ok ? r.json() : [];
+  }
+  async function sbGetAll(table) {
+    const r = await fetch(SB_URL+'/rest/v1/'+table+'?select=*&order=created_at.desc', {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    return r.ok ? r.json() : [];
+  }
+  async function sbPost(table, data) {
+    const r = await fetch(SB_URL+'/rest/v1/'+table, {method:'POST',headers:{...sbH,'Prefer':'return=minimal'},body:JSON.stringify(data)});
+    if(!r.ok){const e=await r.text();throw new Error(e);}
+    return true;
+  }
+  async function sbPatch(table, filters, data) {
+    let url=SB_URL+'/rest/v1/'+table+'?';
+    Object.entries(filters).forEach(([k,v],i)=>url+=(i?'&':'')+k+'=eq.'+encodeURIComponent(v));
+    await fetch(url,{method:'PATCH',headers:sbH,body:JSON.stringify(data)});
+  }
+  async function sbDelete(table, filters) {
+    let url=SB_URL+'/rest/v1/'+table+'?';
+    Object.entries(filters).forEach(([k,v],i)=>url+=(i?'&':'')+k+'=eq.'+encodeURIComponent(v));
+    await fetch(url,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+  }
+
+// ─── ADMIN PASSWORD ──────────────────────────────────────────────
+// Change this to whatever password you want
+const ADMIN_PASSWORD = 'folio-admin-2024';
+
+function checkPass(){
+  const val = document.getElementById('adminPassInput').value;
+  const errEl = document.getElementById('lockErr');
+  if(val === ADMIN_PASSWORD){
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadAdmin();
+  } else {
+    document.getElementById('adminPassInput').classList.add('err');
+    errEl.textContent = 'Incorrect password. Try again.';
+    setTimeout(()=>{
+      document.getElementById('adminPassInput').classList.remove('err');
+      errEl.textContent='';
+    },2000);
+  }
+}
+
+// ─── NOTIFICATION EMAIL ──────────────────────────────────────────
+function loadEmail(){
+  const saved = localStorage.getItem('folio:admin:notifEmail') || '';
+  document.getElementById('notifEmail').value = saved;
+}
+
+function saveEmail(){
+  const email = document.getElementById('notifEmail').value.trim();
+  if(!email || !email.includes('@')){
+    showToast('Please enter a valid email address');
+    return;
+  }
+  localStorage.setItem('folio:admin:notifEmail', email);
+  const tag = document.getElementById('savedTag');
+  tag.classList.add('show');
+  setTimeout(()=>tag.classList.remove('show'), 2500);
+  showToast('Notification email updated to ' + email);
+}
+
+// ─── LOAD DATA ───────────────────────────────────────────────────
+const COLORS = ['#4f46e5','#16a06a','#ef4444','#f59e0b','#8b5cf6','#3b82f6','#ec4899','#0ea5e9'];
+
+
+async function getAllFirms(){ const d=await apiCall('get-all-firms'); return d.firms||[]; };
+  });
+}
+async function getProspectCount(slug){ try{ const d=await apiCall('get-prospects',{slug}); return (d.prospects||[]).length; }catch(e){ return 0; } }}="'+slug+'"');
+  return records.length;
+}
+
+function timeAgo(iso){
+  if(!iso)return '—';
+  const d=new Date(iso),now=new Date(),diff=Math.floor((now-d)/1000);
+  if(diff<60)return 'just now';
+  if(diff<3600)return Math.floor(diff/60)+'m ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  if(diff<604800)return Math.floor(diff/86400)+'d ago';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function initials(str){
+  return str.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+}
+
+let allFirms = [];
+
+async function loadAdmin(){
+  loadEmail();
+  allFirms = await getAllFirms();
+  renderKPIs(allFirms);
+  renderTable(allFirms);
+}
+
+function renderKPIs(firms){
+  const total = firms.length;
+  const totalProspects = firms.reduce((s,f)=>s+getProspectCount(f.slug),0);
+  const thisWeek = firms.filter(f=>{
+    const d=new Date(f.createdAt);
+    const now=new Date();
+    return (now-d)<7*86400*1000;
+  }).length;
+  const avgProspects = total ? (totalProspects/total).toFixed(1) : 0;
+
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">Total advisors</div><div class="kpi-value">${total}</div><div class="kpi-sub">all time signups</div></div>
+    <div class="kpi-card"><div class="kpi-label">Signed up this week</div><div class="kpi-value">${thisWeek}</div><div class="kpi-sub">last 7 days</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total prospects</div><div class="kpi-value">${totalProspects}</div><div class="kpi-sub">across all firms</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg prospects/firm</div><div class="kpi-value">${avgProspects}</div><div class="kpi-sub">per advisor account</div></div>`;
+}
+
+function renderTable(firms){
+  const tbody = document.getElementById('advisorTableBody');
+  if(!firms.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="7">No advisor signups yet. Share the site and they'll appear here.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = firms.map((f,i)=>{
+    const count = 0; // loaded async below
+    const col = COLORS[i%COLORS.length];
+    const plan = f.plan||'Free';
+    const planClass = 'plan-'+plan.toLowerCase();
+    return`<tr>
+      <td>
+        <div class="firm-cell">
+          <div class="firm-avatar" style="background:${col}">${initials(f.name||f.slug)}</div>
+          <div>
+            <div class="firm-name">${f.name||'—'}</div>
+            <div class="firm-slug">?firm=${f.slug}</div>
+          </div>
+        </div>
+      </td>
+      <td>${f.advisorName||'—'}</td>
+      <td>${f.email||'—'}</td>
+      <td><span class="plan-badge ${planClass}">${plan}</span></td>
+      <td><span class="prospect-count">${count}</span></td>
+      <td><span class="time-ago">${timeAgo(f.createdAt)}</span></td>
+      <td>
+        <div class="action-row">
+          <a class="action-link" href="dashboard.html?firm=${f.slug}" target="_blank">View dashboard</a>
+          <span class="action-link" onclick="copyLink('${f.slug}')">Copy links</span>
+          <span class="action-link danger" onclick="deleteAdvisor('${f.slug}')">Remove</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable(q){
+  const filtered = allFirms.filter(f=>
+    (f.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (f.email||'').toLowerCase().includes(q.toLowerCase()) ||
+    (f.advisorName||'').toLowerCase().includes(q.toLowerCase()) ||
+    (f.slug||'').toLowerCase().includes(q.toLowerCase())
+  );
+  renderTable(filtered);
+}
+
+function copyLink(slug){
+  const base = window.location.origin + '/';
+  const text = `Assessment: ${base}index.html?firm=${slug}\nDashboard: ${base}dashboard.html?firm=${slug}`;
+  navigator.clipboard.writeText(text).then(()=>showToast('Links copied for ?firm='+slug));
+}
+
+async function deleteAdvisor(slug){
+  if(!confirm('Remove this advisor account and all their prospect data? This cannot be undone.'))return;
+  // For now just refresh — full delete via Airtable dashboard
+  showToast('Use Airtable to fully remove advisor data');
+  allFirms = await getAllFirms();
+  renderKPIs(allFirms);
+  renderTable(allFirms);
+  showToast('Advisor account removed');
+}
+
+function exportCSV(){
+  const firms = getAllFirms();
+  const rows = [['Firm Name','Advisor Name','Email','Slug','Plan','Prospects','Signed Up']];
+  firms.forEach(f=>{
+    rows.push([f.name||'',f.advisorName||'',f.email||'',f.slug||'',f.plan||'Free',getProspectCount(f.slug),f.createdAt||'']);
+  });
+  const csv = rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'folio-advisors-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  showToast('CSV downloaded');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// allow enter key on password field
+document.getElementById('adminPassInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')checkPass();
+});
+</script>
+</body>
+</html>
